@@ -7,9 +7,6 @@ import "@openzeppelin/contracts/utils/math/SafeMath.sol";
 contract AccessControl {
     using SafeMath for uint256;
 
-    /**
-     * Events
-     */
     event Deposit(address indexed sender, uint256 value);
     event Submission(uint256 indexed transactionId);
     event Confirmation(address indexed sender, uint256 indexed transactionId);
@@ -21,9 +18,6 @@ contract AccessControl {
     event QuorumUpdate(uint256 quorum);
     event AdminTransfer(address indexed newAdmin);
 
-    /**
-     * Storage
-     */
     address public admin;
 
     // track addresses of owners
@@ -31,9 +25,6 @@ contract AccessControl {
     mapping(address => bool) public isOwner;
     uint256 quorum;
 
-    /**
-     * Modifiers
-     */
     modifier onlyAdmin() {
         require(msg.sender == admin, "Admin restricted function");
         _;
@@ -54,9 +45,6 @@ contract AccessControl {
         _;
     }
 
-    /**
-     * @dev Contract constructor instantiates wallet interface and sets msg.sender to admin
-     */
     constructor(address[] memory _owners) {
         admin = msg.sender;
         require(
@@ -71,14 +59,6 @@ contract AccessControl {
         quorum = SafeMath.div(num, 100);
     }
 
-    /**
-     * Public Functions
-     */
-
-    /**
-     * @dev Allows admin to add new owner to the wallet
-     * @param owner Address of the new owner
-     */
     function addOwner(address owner)
         public
         onlyAdmin
@@ -96,10 +76,6 @@ contract AccessControl {
         updateQuorum(owners);
     }
 
-    /**
-     * @dev Allows admin to remove owner from the wallet
-     * @param owner Address of the new owner
-     */
     function removeOwner(address owner)
         public
         onlyAdmin
@@ -121,11 +97,6 @@ contract AccessControl {
         updateQuorum(owners);
     }
 
-    /**
-     * @dev Allows admin to transfer owner from one wallet to  another
-     * @param _from Address of the old owner
-     * @param _to Address of the new owner
-     */
     function transferOwner(address _from, address _to)
         public
         onlyAdmin
@@ -152,24 +123,12 @@ contract AccessControl {
         emit OwnerAddition(_to);
     }
 
-    /**
-     * @dev Allows admin to transfer admin rights to another address
-     * @param newAdmin Address of the new admin
-     */
     function renounceAdmin(address newAdmin) public onlyAdmin {
         admin = newAdmin;
 
         emit AdminTransfer(newAdmin);
     }
 
-    /**
-     * Internal Functions
-     */
-
-    /**
-     * @dev Updates the new quorum value
-     * @param _owners List of address of the owners
-     */
     function updateQuorum(address[] memory _owners) internal {
         uint256 num = SafeMath.mul(_owners.length, 60);
         quorum = SafeMath.div(num, 100);
